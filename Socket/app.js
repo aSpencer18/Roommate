@@ -4,7 +4,7 @@ console.log("Socket server starting...");
 
 const io = new Server({
   cors: {
-    origin: "http://localhost:5173",
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
   },
 });
 
@@ -12,6 +12,7 @@ let onlineUser = [];
 
 const addUser = (userId, socketId) => {
   const userExits = onlineUser.find((user) => user.userId === userId);
+
   if (!userExits) {
     onlineUser.push({ userId, socketId });
   }
@@ -32,6 +33,7 @@ io.on("connection", (socket) => {
 
   socket.on("sendMessage", ({ receiverId, data }) => {
     const receiver = getUser(receiverId);
+
     io.to(receiver.socketId).emit("getMessage", data);
   });
 
@@ -40,4 +42,4 @@ io.on("connection", (socket) => {
   });
 });
 
-io.listen("4000");
+io.listen(process.env.PORT || 4000);
